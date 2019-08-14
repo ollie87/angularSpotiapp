@@ -1,8 +1,9 @@
 import { TestBed, getTestBed, inject } from '@angular/core/testing';
 
 import { SpotifyService } from './spotify.service';
-import { HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { newReleases } from '../mocks/new-releases.json';
+import { searchArtist } from '../mocks/searchArtists.json';
 
 
 describe('SpotifyService', () => {
@@ -28,16 +29,29 @@ describe('SpotifyService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get results', () => {
+  it('should return an observable with new releases', () => {
     const swapiUrl = 'https://api.spotify.com/v1/browse/new-releases';
     service.getNewReleases()
-    .subscribe(
-      (res) => {
-        expect(res).toEqual(newReleases);
-      }
-    );
+      .subscribe(
+        (res) => {
+          expect(res).toEqual(newReleases);
+        }
+      );
     const req = httpMock.expectOne(swapiUrl);
     expect(req.request.method).toBe('GET');
     req.flush(newReleases);
+  });
+
+  it('should return an observable with search', () => {
+    const swapiUrl = 'https://api.spotify.com/v1/search?query=slash&type=artist&offset=0&limit=20';
+    service.getArtist('slash')
+      .subscribe(
+        (res) => {
+          expect(res).toEqual(searchArtist);
+        }
+      );
+    const req = httpMock.expectOne(swapiUrl);
+    expect(req.request.method).toBe('GET');
+    req.flush(searchArtist);
   });
 });
